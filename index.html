@@ -482,6 +482,138 @@
             background: rgba(239, 68, 68, 0.9);
             color: white;
         }
+        .variant-showcase {
+            padding: 1.5rem;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .variant-before-stage {
+            position: relative;
+            background: #dbeafe;
+            border: 1px solid rgba(148,163,184,0.22);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .variant-before-stage img {
+            width: 100%;
+            aspect-ratio: 800 / 533;
+            object-fit: cover;
+            display: block;
+        }
+        .variant-before-overlay {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            width: min(340px, 42%);
+            padding: 1rem 1.1rem;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.14);
+            border: 1px solid rgba(255,255,255,0.65);
+        }
+        .variant-before-stage h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 0.45rem;
+        }
+        .variant-before-stage p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+        .variant-stage-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(15, 23, 42, 0.08);
+            color: var(--text-main);
+        }
+        .variant-after-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+        .variant-after-card {
+            background: var(--white);
+            border: 1px solid rgba(4,120,87,0.14);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+        .variant-after-card img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            display: block;
+        }
+        .variant-after-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.9rem 1rem 0.75rem;
+            background: linear-gradient(180deg, rgba(4,120,87,0.06) 0%, rgba(255,255,255,0.9) 100%);
+            border-bottom: 1px solid rgba(4,120,87,0.08);
+        }
+        .variant-model-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2rem;
+            height: 2rem;
+            padding: 0 0.65rem;
+            border-radius: 999px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+        .variant-after-head h4 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+        .variant-after-body {
+            padding: 0.95rem 1rem 1rem;
+        }
+        .variant-mini-prompt {
+            display: block;
+            padding: 0.65rem 0.8rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        .variant-mini-prompt strong {
+            color: var(--text-main);
+            font-weight: 800;
+        }
+        .variant-summary {
+            margin-top: 1rem;
+            padding: 1rem 1.15rem;
+            border-radius: 12px;
+            background: rgba(4,120,87,0.06);
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
 
         /* ===== SPEC TABLE / INFO CARDS ===== */
         .spec-grid {
@@ -979,6 +1111,8 @@
             .spec-grid { grid-template-columns: repeat(2, 1fr); }
             .ba-images { grid-template-columns: 1fr; }
             .ba-img-2col { grid-template-columns: 1fr; }
+            .variant-before-overlay { width: min(320px, 48%); }
+            .variant-after-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 640px) {
             section { padding: 4rem 0; }
@@ -989,6 +1123,16 @@
             .ba-card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 1.25rem; }
             .ba-images { padding: 1rem; gap: 1rem; }
             .ba-card-footer { padding: 1rem 1.25rem; font-size: 0.85rem; }
+            .variant-showcase { padding: 1rem; }
+            .variant-before-overlay {
+                position: static;
+                transform: none;
+                width: auto;
+                margin: 0.85rem;
+                background: rgba(255,255,255,0.94);
+            }
+            .variant-after-grid { grid-template-columns: 1fr; }
+            .variant-after-head { align-items: flex-start; flex-direction: column; }
             .flowchart-area { padding: 1.5rem; }
             .flow-node { padding: 1.5rem 1rem; }
             .pricing-area { padding: 1.5rem; }
@@ -1477,7 +1621,7 @@
                 </div>
                 <div style="text-align:center; margin-top:1.25rem;">
                     <div style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.8rem; color:var(--primary); background:rgba(4,120,87,0.06); padding:0.5rem 1rem; border-radius:99px;">
-                        <i class="fa-solid fa-rotate"></i> このサイクルを継続的に回しています
+                        <i class="fa-solid fa-rotate"></i> このサイクルを継続的に回しチューニング
                     </div>
                 </div>
             </div>
@@ -1667,6 +1811,60 @@
                 </div>
                 <div class="ba-card-footer">
                     ご神木の周囲に ZDT-R を配置し、夜間のLED演出まで含めて提案した例。昼間の現場写真から、空間演出を含む完成イメージを即座に作成できます。
+                </div>
+            </div>
+
+            <div class="ba-card reveal" style="opacity:0.92; margin-top:2rem;">
+                <div class="ba-card-header">
+                    <span class="ba-number" style="background: var(--accent-dark);">?</span>
+                    <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「既設テントを{型番}に差し替えて。」</span>
+                </div>
+                <div class="variant-showcase">
+                    <div class="variant-before-stage">
+                        <img src="./12_before.jpg" alt="既設テントの現場写真" loading="lazy" decoding="async">
+                        <div class="variant-before-overlay">
+                            <span class="variant-stage-tag"><i class="fa-solid fa-camera"></i> Before</span>
+                            <h4>既設テントの現場写真</h4>
+                            <p>同じ現場写真をベースに、型番だけを差し替えて3種類のパーゴラ案を横並びで比較した例です。</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="variant-after-grid">
+                            <div class="variant-after-card">
+                                <div class="variant-after-head">
+                                    <span class="variant-model-badge">01</span>
+                                    <h4>ALV-3030</h4>
+                                </div>
+                                <img src="./12_after01.png" alt="ALV-3030に差し替えたイメージ" loading="lazy" decoding="async">
+                                <div class="variant-after-body">
+                                    <span class="variant-mini-prompt"><strong>Prompt:</strong> 既設テントをALV-3030に差し替えて。</span>
+                                </div>
+                            </div>
+                            <div class="variant-after-card">
+                                <div class="variant-after-head">
+                                    <span class="variant-model-badge">02</span>
+                                    <h4>アルオーニ</h4>
+                                </div>
+                                <img src="./12_after02.png" alt="アルオーニに差し替えたイメージ" loading="lazy" decoding="async">
+                                <div class="variant-after-body">
+                                    <span class="variant-mini-prompt"><strong>Prompt:</strong> 既設テントをアルオーニに差し替えて。</span>
+                                </div>
+                            </div>
+                            <div class="variant-after-card">
+                                <div class="variant-after-head">
+                                    <span class="variant-model-badge">03</span>
+                                    <h4>アルミ屋根パーゴラ</h4>
+                                </div>
+                                <img src="./12_after03.png" alt="アルミ屋根パーゴラに差し替えたイメージ" loading="lazy" decoding="async">
+                                <div class="variant-after-body">
+                                    <span class="variant-mini-prompt"><strong>Prompt:</strong> 既設テントをアルミ屋根パーゴラに差し替えて。</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="variant-summary">
+                            同じ現場に対して複数の製品候補を即座に出し分けられるため、営業提案や社内検討の初期段階で「どのパーゴラが最も景観に合うか」を短時間で比較できます。
+                        </div>
+                    </div>
                 </div>
             </div>
 
