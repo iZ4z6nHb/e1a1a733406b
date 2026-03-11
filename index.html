@@ -1551,6 +1551,46 @@
                 </div>
             </div>
 
+            <div class="ba-card reveal" style="opacity:0.92; margin-top:2rem;">
+                <div class="ba-card-header">
+                    <span class="ba-number" style="background: var(--accent-dark);">?</span>
+                    <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「車止めをSWBFP-190Kに置き換えて」</span>
+                </div>
+                <div class="ba-images">
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-before">Before（既設品）</span>
+                        <img src="./09_before.jpg" alt="既設の車止め" style="aspect-ratio:16/9; object-fit:cover;">
+                    </div>
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-after">After（自社製品）</span>
+                        <img src="./09_after.png" alt="自社製品に置換" style="aspect-ratio:16/9; object-fit:cover;">
+                    </div>
+                </div>
+                <div class="ba-card-footer">
+                    既設の車止めを自社製品に置き換えた例。現場写真から製品の置き換えイメージを即座に生成できます。
+                </div>
+            </div>
+
+            <div class="ba-card reveal" style="opacity:0.92; margin-top:2rem;">
+                <div class="ba-card-header">
+                    <span class="ba-number" style="background: var(--accent-dark);">?</span>
+                    <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「転落防止柵をSWCO-WIに置き換えて」</span>
+                </div>
+                <div class="ba-images">
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-before">Before（既設品）</span>
+                        <img src="./10_before.webp" alt="既設の転落防止柵" style="aspect-ratio:16/9; object-fit:cover;">
+                    </div>
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-after">After（自社製品）</span>
+                        <img src="./10_after.png" alt="自社製品に置換" style="aspect-ratio:16/9; object-fit:cover;">
+                    </div>
+                </div>
+                <div class="ba-card-footer">
+                    転落防止柵を自社製品に置き換えた例。既設品からの置き換え提案にも活用できます。
+                </div>
+            </div>
+
             <div class="constraint-grid" style="margin-top: 2.5rem;">
                 <div class="constraint-card reveal" style="background: white;">
                     <h4><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> 既存AIの課題</h4>
@@ -1560,10 +1600,52 @@
                     <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
                     <p>社内のデータベースに紐づいている製品を学習データとしてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
                 </div>
-                <div class="constraint-card reveal" style="background: white;">
-                    <h4><i class="fa-solid fa-handshake" style="color: var(--info);"></i> 営業現場での活用イメージ</h4>
-                    <p>たとえば営業先で現地の写真を撮り、「ここにソラマメを置いて」と入力するだけで設置イメージをその場で生成できるようになります。提案書の作成を待たずに、お客様との打ち合わせ中にイメージを共有できる可能性があります。</p>
+            </div>
+
+            <!-- 営業活用イメージ：ビジュアルフロー -->
+            <div class="reveal" style="margin-top: 2.5rem; background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border-radius: var(--radius-md); padding: 2.5rem; border: 1px solid rgba(59,130,246,0.15);">
+                <div style="text-align:center; margin-bottom: 2rem;">
+                    <span style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--info); color:white; padding:0.4rem 1.2rem; border-radius:99px; font-size:0.8rem; font-weight:700; letter-spacing:0.05em;">
+                        <i class="fa-solid fa-lightbulb"></i> 営業現場での活用イメージ
+                    </span>
                 </div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap;">
+                    <!-- Step 1 -->
+                    <div style="flex:1; min-width:160px; max-width:220px; text-align:center; padding:1.5rem 1rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:56px; height:56px; margin:0 auto 0.75rem; background:var(--info); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-camera" style="color:white; font-size:1.3rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.95rem; margin-bottom:0.3rem;">現地で写真を撮影</h4>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">営業先でスマホで<br>設置予定場所を撮る</p>
+                    </div>
+                    <!-- Arrow -->
+                    <div style="font-size:1.5rem; color:var(--info); flex-shrink:0;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <!-- Step 2 -->
+                    <div style="flex:1; min-width:160px; max-width:220px; text-align:center; padding:1.5rem 1rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:56px; height:56px; margin:0 auto 0.75rem; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-keyboard" style="color:white; font-size:1.3rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.95rem; margin-bottom:0.3rem;">「ソラマメを置いて」</h4>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">製品名を入力するだけ<br>DBから製品情報を自動取得</p>
+                    </div>
+                    <!-- Arrow -->
+                    <div style="font-size:1.5rem; color:var(--info); flex-shrink:0;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <!-- Step 3 -->
+                    <div style="flex:1; min-width:160px; max-width:220px; text-align:center; padding:1.5rem 1rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:56px; height:56px; margin:0 auto 0.75rem; background:var(--accent-dark); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-image" style="color:white; font-size:1.3rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.95rem; margin-bottom:0.3rem;">設置イメージを即共有</h4>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin:0;">打ち合わせ中に<br>お客様にイメージを提示</p>
+                    </div>
+                </div>
+                <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:var(--text-secondary); line-height:1.8;">
+                    将来的には社内利用にとどまらず、お客様自身が現場写真をアップロードし、<br>セコロ製品への置き換えイメージをその場で確認できるような仕組みも検討できます。
+                </p>
             </div>
         </div>
     </section>
