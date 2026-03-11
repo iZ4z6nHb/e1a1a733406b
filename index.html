@@ -446,14 +446,36 @@
 
         /* 3-column comparison */
         .ba-images-3col {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.25rem;
-            padding: 1.25rem;
+            padding: 1.5rem;
             background: #f1f5f9;
         }
-        .ba-images-3col .ba-img-wrap img {
-            max-height: 400px;
+        .ba-images-3col .ba-img-full {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .ba-images-3col .ba-img-full img {
+            max-height: 500px;
+            width: 100%;
+            object-fit: contain;
+        }
+        .ba-img-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .ba-img-2col .ba-img-wrap {
+            text-align: center;
+        }
+        .ba-img-2col .ba-img-wrap img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+        }
+        .ba-images-3col .ba-caption {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.6;
         }
         .ba-img-label.label-fail {
             right: 0.75rem;
@@ -956,7 +978,7 @@
             .pillars-grid, .constraint-grid { grid-template-columns: 1fr; }
             .spec-grid { grid-template-columns: repeat(2, 1fr); }
             .ba-images { grid-template-columns: 1fr; }
-            .ba-images-3col { grid-template-columns: 1fr; }
+            .ba-img-2col { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
             section { padding: 4rem 0; }
@@ -1076,8 +1098,7 @@
                             STEP TWO
                         </div>
                         <h3>AIが処理（数十秒）</h3>
-                        <p>送信ボタンを押すと、システムが構図維持・向き保持などの制約を自動でプロンプトに付加し、AI モデルへリクエストします。ユーザー側の追加操作は不要です。</p>
-                    </div>
+                                            </div>
                     <div class="process-image">
                         <img src="./images/howto2.png" alt="Step 2: 処理中画面">
                     </div>
@@ -1469,7 +1490,7 @@
             <div class="section-header reveal">
                 <span class="section-tag" style="background: #fffbeb; color: var(--accent-dark);"><i class="fa-solid fa-flask"></i> Coming Soon</span>
                 <h2 class="section-title">将来的に検討していること</h2>
-                <p class="section-desc">社内データベースに登録された製品情報をAIが参照し、製品名を指示するだけで現場写真への合成イメージを生成する機能です。現時点ではまだ利用できません。</p>
+                <p class="section-desc">社内データベースに登録された製品情報をAIが参照し、製品名を指示するだけで現場写真への合成イメージを生成する機能です。</p>
             </div>
 
 
@@ -1479,21 +1500,23 @@
                     <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ソラマメを置いて」</span>
                 </div>
                 <div class="ba-images-3col">
-                    <div class="ba-img-wrap">
+                    <div class="ba-img-wrap ba-img-full">
                         <span class="ba-img-label label-before">元の写真</span>
-                        <img src="./06_before.jpg" alt="現場写真" style="max-height:400px; object-fit:cover;">
+                        <img src="./06_before.jpg" alt="現場写真">
+                        <p class="ba-caption">現場で撮影した元の写真</p>
                     </div>
-                    <div class="ba-img-wrap">
-                        <span class="ba-img-label label-fail">通常のAI（製品を知らない）</span>
-                        <img src="./06_after2.png" alt="通常AI生成結果" style="max-height:400px; object-fit:cover;">
+                    <div class="ba-img-2col">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-fail">通常のAI（製品を知らない）</span>
+                            <img src="./06_after2.png" alt="通常AI生成結果">
+                            <p class="ba-caption">製品データなしで生成した結果。「ソラマメ」の形状を知らないため正しく再現できない</p>
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">社内DB連携</span>
+                            <img src="./06_after.png" alt="社内DB連携による生成イメージ">
+                            <p class="ba-caption">社内DBから製品情報を参照して生成するイメージ</p>
+                        </div>
                     </div>
-                    <div class="ba-img-wrap">
-                        <span class="ba-img-label label-after">社内DB連携AI</span>
-                        <img src="./06_after.png" alt="社内DB連携による生成イメージ" style="max-height:400px; object-fit:cover;">
-                    </div>
-                </div>
-                <div class="ba-card-footer">
-                    左: 元の現場写真 ／ 中央: 製品データなしで生成した結果（ソラマメの形状を知らないため正しく再現できない） ／ 右: 社内DBから製品情報を参照して生成するイメージ
                 </div>
             </div>
 
