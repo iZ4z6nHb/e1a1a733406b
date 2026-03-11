@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI写真編集機能 技術解説 - 風憩セコロ社内システム</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-dark: #065f46;
+            --primary-light: #ecfdf5;
+            --secondary: #0f766e;
+            --accent: #f59e0b;
+            --accent-dark: #b45309;
+            --info: #3b82f6;
+            --info-light: #eff6ff;
+
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --border: rgba(226, 232, 240, 0.8);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 50px -12px rgba(0,0,0,0.1);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            background: var(--bg);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        code, .mono {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+        }
+
+        /* ===== HEADER ===== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .site-header.scrolled {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 1px 20px rgba(0,0,0,0.06);
+            padding: 0.75rem 2rem;
+        }
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand-logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .header-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.35rem 1rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        /* ===== LAYOUT ===== */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        section { padding: 6rem 0; position: relative; }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(165deg, #f0fdf4 0%, #ecfdf5 30%, #f0f9ff 60%, #f8fafc 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(4,120,87,0.06) 0%, transparent 70%);
+            animation: heroFloat 20s ease-in-out infinite;
+        }
+        @keyframes heroFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, 20px) scale(1.05); }
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            padding-top: 5rem;
+        }
+
+        .hero-overline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 0.4rem 1rem 0.4rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .hero-overline .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, #059669 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 520px;
+            line-height: 1.85;
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        /* Hero Demo */
+        .hero-demo {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl), 0 0 80px rgba(4,120,87,0.08);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .hero-demo-img {
+            position: relative;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+        .hero-demo-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .hero-after-img {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .hero-after-img.show {
+            opacity: 1;
+        }
+        .hero-demo-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border);
+            background: #fafafa;
+        }
+        .hero-demo-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+            min-height: 42px;
+        }
+        .hero-demo-field i {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .hero-cursor {
+            color: var(--primary);
+            animation: blink 1s step-end infinite;
+            font-weight: 300;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .hero-demo-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: none;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .hero-demo-btn.active {
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+        .hero-demo-btn.processing {
+            background: var(--primary);
+            color: white;
+            animation: btnPulse 1s ease-in-out infinite;
+        }
+        @keyframes btnPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Step typing demo */
+        .step-typing-demo {
+            margin-top: 1.25rem;
+        }
+        .step-typing-field {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+            min-height: 42px;
+            box-shadow: var(--shadow-sm);
+        }
+        .step-typing-field i {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ===== WAVE DIVIDER ===== */
+        .wave-divider { position: relative; height: 80px; overflow: hidden; }
+        .wave-divider svg { position: absolute; bottom: 0; width: 100%; height: 80px; }
+        .wave-divider.flip svg { top: 0; bottom: auto; transform: rotate(180deg); }
+
+        /* ===== SECTION TITLES ===== */
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.4rem 1.25rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 720px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ===== BEFORE/AFTER ===== */
+        .ba-section { background: linear-gradient(180deg, var(--bg) 0%, #f1f5f9 100%); }
+        .ba-grid { display: flex; flex-direction: column; gap: 4rem; }
+        .ba-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .ba-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+        .ba-card-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #fafafa, #ffffff);
+        }
+        .ba-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .ba-prompt {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .ba-prompt i { color: var(--primary); font-size: 0.9rem; }
+
+        .ba-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            padding: 1.25rem;
+            background: #f1f5f9;
+            gap: 1.25rem;
+        }
+        .ba-img-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        .ba-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ba-img-label {
+            position: absolute;
+            top: 0.75rem;
+            padding: 0.3rem 1rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            backdrop-filter: blur(8px);
+        }
+        .ba-img-label.label-before { left: 0.75rem; background: rgba(255,255,255,0.9); color: var(--text-secondary); }
+        .ba-img-label.label-after { right: 0.75rem; background: rgba(4,120,87,0.9); color: white; }
+
+        .ba-card-footer {
+            padding: 1.25rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            background: #fafafa;
+            border-top: 1px solid var(--border);
+        }
+
+        /* 3-column comparison */
+        .ba-images-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            background: #f1f5f9;
+        }
+        .ba-images-3col .ba-img-wrap img {
+            max-height: 400px;
+        }
+        .ba-img-label.label-fail {
+            right: 0.75rem;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        /* ===== SPEC TABLE / INFO CARDS ===== */
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .spec-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .spec-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .spec-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .spec-card-icon.green { background: var(--primary-light); color: var(--primary); }
+        .spec-card-icon.blue { background: var(--info-light); color: var(--info); }
+        .spec-card-icon.amber { background: #fffbeb; color: var(--accent-dark); }
+        .spec-card-icon.slate { background: #f1f5f9; color: var(--text-secondary); }
+        .spec-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.01em;
+        }
+        .spec-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .spec-card .spec-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+
+        /* ===== CODE BLOCK ===== */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+        .code-block .comment { color: #64748b; }
+        .code-block .string { color: #86efac; }
+        .code-block .keyword { color: #93c5fd; }
+        .code-block .label { color: #94a3b8; display: inline-block; min-width: 180px; }
+
+        /* ===== PROCESS SECTION ===== */
+        .process-section { background: var(--white); }
+        .process-list { display: flex; flex-direction: column; gap: 3rem; position: relative; }
+        .process-list::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--border), var(--border), transparent);
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        .process-step {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .process-step:nth-child(even) .process-content { order: 2; }
+        .process-step:nth-child(even) .process-image { order: 1; }
+        .process-content { padding: 2rem; }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+        .step-badge .step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin-left: -0.4rem;
+        }
+        .process-content h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        .process-content p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+        .process-image {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+        .process-image img { width: 100%; height: auto; display: block; }
+
+        /* ===== WORKFLOW COMPARISON ===== */
+        .workflow-compare {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+        .workflow-col {
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            position: relative;
+        }
+        .workflow-col.old-flow {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+        }
+        .workflow-col.new-flow {
+            background: var(--primary-light);
+            border: 1px solid rgba(4,120,87,0.15);
+        }
+        .workflow-col-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 2px solid rgba(0,0,0,0.06);
+        }
+        .workflow-col.old-flow .workflow-col-header { border-color: #fecdd3; }
+        .workflow-col.new-flow .workflow-col-header { border-color: rgba(4,120,87,0.15); }
+        .workflow-col-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .old-flow .workflow-col-icon { background: #fee2e2; color: #dc2626; }
+        .new-flow .workflow-col-icon { background: rgba(4,120,87,0.1); color: var(--primary); }
+        .workflow-col-header h3 {
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+        .workflow-col-header .workflow-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .old-flow .workflow-label { color: #dc2626; }
+        .new-flow .workflow-label { color: var(--primary); }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .wf-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.06);
+        }
+        .wf-step:last-child { border-bottom: none; }
+        .wf-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+        .old-flow .wf-step-num { background: #fecdd3; color: #be123c; }
+        .new-flow .wf-step-num { background: rgba(4,120,87,0.12); color: var(--primary-dark); }
+        .wf-step-text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .wf-step-text small {
+            display: block;
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.8rem;
+            margin-top: 0.15rem;
+        }
+
+        .workflow-result {
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .old-flow .workflow-result {
+            background: #fee2e2;
+            color: #be123c;
+        }
+        .new-flow .workflow-result {
+            background: rgba(4,120,87,0.1);
+            color: var(--primary-dark);
+        }
+        .workflow-result i { font-size: 1.3rem; }
+
+        .workflow-vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.5rem;
+        }
+        .workflow-vs-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 1024px) {
+            .workflow-compare {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .workflow-vs { padding: 0; }
+            .workflow-vs-badge {
+                width: 40px;
+                height: 40px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ===== ARCHITECTURE SECTION ===== */
+        .infographic-section { background: linear-gradient(180deg, #f1f5f9 0%, var(--bg) 100%); }
+        .infographic-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .flowchart-area { padding: 3rem; }
+        .flowchart {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .flow-node {
+            flex: 1;
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            border-radius: var(--radius-md);
+            max-width: 300px;
+            transition: transform 0.3s ease;
+        }
+        .flow-node:hover { transform: translateY(-4px); }
+        .flow-node.internal { background: var(--primary-light); border: 2px solid rgba(4,120,87,0.15); }
+        .flow-node.api { background: var(--info-light); border: 2px solid rgba(59,130,246,0.15); }
+        .flow-node.ai {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            color: white;
+            box-shadow: 0 20px 40px rgba(15,23,42,0.25);
+            transform: scale(1.03);
+        }
+        .flow-node.ai:hover { transform: scale(1.06) translateY(-4px); }
+        .node-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        .internal .node-icon-wrap { background: rgba(4,120,87,0.1); color: var(--primary); }
+        .api .node-icon-wrap { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        .ai .node-icon-wrap { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .flow-node h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .flow-node p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+        .ai p { color: #94a3b8; }
+        .flow-arrow { display: flex; align-items: center; padding: 0 1rem; color: #cbd5e1; font-size: 1.5rem; flex-shrink: 0; }
+
+        .pricing-area {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            padding: 2.5rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        .pricing-text h3 { font-size: 1.4rem; font-weight: 800; color: var(--accent-dark); margin-bottom: 0.5rem; }
+        .pricing-text p { color: #92400e; font-weight: 500; font-size: 0.95rem; }
+        .pricing-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--accent-dark);
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 20px rgba(180,83,9,0.12);
+            white-space: nowrap;
+        }
+
+        /* ===== CONSTRAINT BOX ===== */
+        .constraint-section { background: var(--white); }
+        .constraint-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .constraint-card {
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+        .constraint-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .constraint-card h4 i { color: var(--primary); }
+        .constraint-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        .constraint-card .code-inline {
+            background: #1e293b;
+            color: #86efac;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* ===== PILLARS ===== */
+        .pillars-section { background: var(--bg); }
+        .pillars-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        .pillar-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .pillar-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
+        .pillar-header { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; }
+        .pillar-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+            background: var(--white);
+        }
+        .pillar-icon img { width: 100%; height: 100%; object-fit: contain; padding: 0.75rem; }
+        .pillar-header h3 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+        .pillar-card p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.8; }
+        .feature-list { list-style: none; }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+        .feature-list li i { color: var(--primary); margin-top: 0.2rem; flex-shrink: 0; }
+
+        /* ===== CTA ===== */
+        .cta-section { padding: 6rem 0; }
+        .cta-card {
+            background: linear-gradient(145deg, var(--primary-dark), var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            padding: 5rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(4,120,87,0.2);
+        }
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .cta-card * { position: relative; z-index: 2; }
+        .cta-card h2 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .cta-card p { color: rgba(255,255,255,0.8); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .cta-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 2rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 2.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero-content { grid-template-columns: 1fr; padding-top: 7rem; gap: 3rem; }
+            .hero-visual { max-width: 600px; margin: 0 auto; }
+            .hero-float-badge { display: none; }
+            .process-step { grid-template-columns: 1fr; gap: 1.5rem; }
+            .process-step:nth-child(even) .process-content { order: 1; }
+            .process-step:nth-child(even) .process-image { order: 2; }
+            .process-list::before { display: none; }
+            .process-content { padding: 0.5rem; }
+            .flowchart { flex-direction: column; align-items: center; gap: 0.5rem; }
+            .flow-arrow i { transform: rotate(90deg); }
+            .flow-node { max-width: 100%; width: 100%; }
+            .flow-node.ai { transform: scale(1); }
+            .pricing-area { flex-direction: column; text-align: center; padding: 2rem; }
+            .pillars-grid, .constraint-grid { grid-template-columns: 1fr; }
+            .spec-grid { grid-template-columns: repeat(2, 1fr); }
+            .ba-images { grid-template-columns: 1fr; }
+            .ba-images-3col { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            section { padding: 4rem 0; }
+            .container { padding: 0 1.25rem; }
+            .hero { min-height: auto; padding: 0; }
+            .hero-content { padding-top: 6rem; padding-bottom: 3rem; }
+            .hero-title { font-size: 2rem; }
+            .ba-card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 1.25rem; }
+            .ba-images { padding: 1rem; gap: 1rem; }
+            .ba-card-footer { padding: 1rem 1.25rem; font-size: 0.85rem; }
+            .flowchart-area { padding: 1.5rem; }
+            .flow-node { padding: 1.5rem 1rem; }
+            .pricing-area { padding: 1.5rem; }
+            .pricing-value { font-size: 1.6rem; }
+            .cta-card { padding: 3rem 1.5rem; }
+            .spec-grid { grid-template-columns: 1fr; }
+            .pillar-card { padding: 1.75rem; }
+            .pillar-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="site-header" id="siteHeader">
+        <div class="header-inner">
+            <div class="brand-logo">
+                <i class="fa-solid fa-leaf"></i> 風憩セコロ
+            </div>
+            <div class="header-badge">社内システム技術解説</div>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-overline reveal">
+                        <span class="dot"></span>
+                        社内写真管理システム 新機能
+                    </div>
+                    <h1 class="hero-title reveal reveal-delay-1">
+                        事例写真を<br>その場で補正する<br>
+                        <span class="gradient-text">AI写真編集機能</span>
+                    </h1>
+                    <p class="hero-desc reveal reveal-delay-2">
+                        社内の写真管理ページに組み込まれたAI編集機能です。写真詳細画面から直接、日本語の指示文を入力するだけで背景変更・不要物除去・シーン変更などの画像加工が行えます。
+                    </p>
+                </div>
+                <div class="hero-visual reveal reveal-delay-2">
+                    <div class="hero-demo" id="heroDemoContainer">
+                        <!-- Before image (always visible) -->
+                        <div class="hero-demo-img">
+                            <img src="./images/01_before.webp" alt="Before" id="heroBefore">
+                            <img src="./images/01_after.png" alt="After" id="heroAfter" class="hero-after-img">
+                        </div>
+                        <!-- Fake input field -->
+                        <div class="hero-demo-input">
+                            <div class="hero-demo-field" id="heroField">
+                                <i class="fa-solid fa-comment-dots"></i>
+                                <span id="heroTypingText"></span>
+                                <span class="hero-cursor" id="heroCursor">|</span>
+                            </div>
+                            <button class="hero-demo-btn" id="heroBtn">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WAVE ===== -->
+    <div class="wave-divider">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" fill="#ffffff"/>
+        </svg>
+    </div>
+
+    <!-- ===== HOW TO USE ===== -->
+    <section class="process-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-route"></i> How to Use</span>
+                <h2 class="section-title">使い方（3ステップ）</h2>
+                <p class="section-desc">写真管理ページ上で操作が完結します。外部サイトへの移動、画像のダウンロード・再アップロードといった手間は発生しません。</p>
+            </div>
+
+            <div class="process-list">
+                <div class="process-step reveal">
+                    <div class="process-content">
+                        <div class="step-badge">
+                            <span class="step-num">1</span>
+                            STEP ONE
+                        </div>
+                        <h3>写真を開いて指示を入力</h3>
+                        <p>写真詳細ページの右パネルにあるテキスト入力欄に、日本語で編集内容を書きます。「人を消す」「晴れにする」のような短い文でも、複数の要件をまとめた長文でも対応します。</p>
+                        <!-- Typing demo -->
+                        <div class="step-typing-demo" id="stepTypingDemo">
+                            <div class="step-typing-field">
+                                <i class="fa-solid fa-comment-dots"></i>
+                                <span id="stepTypingText"></span><span class="hero-cursor" id="stepCursor">|</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="process-image">
+                        <img src="./images/howto1.png" alt="Step 1: 指示入力画面">
+                    </div>
+                </div>
+
+                <div class="process-step reveal">
+                    <div class="process-content">
+                        <div class="step-badge">
+                            <span class="step-num">2</span>
+                            STEP TWO
+                        </div>
+                        <h3>AIが処理（数十秒）</h3>
+                        <p>送信ボタンを押すと、システムが構図維持・向き保持などの制約を自動でプロンプトに付加し、AI モデルへリクエストします。ユーザー側の追加操作は不要です。</p>
+                    </div>
+                    <div class="process-image">
+                        <img src="./images/howto2.png" alt="Step 2: 処理中画面">
+                    </div>
+                </div>
+
+                <div class="process-step reveal">
+                    <div class="process-content">
+                        <div class="step-badge">
+                            <span class="step-num">3</span>
+                            STEP THREE
+                        </div>
+                        <h3>結果確認・ダウンロード</h3>
+                        <p>生成画像がプレビュー表示されます。そのまま JPEG 形式でダウンロード可能です。</p>
+                    </div>
+                    <div class="process-image">
+                        <img src="./images/howto3.png" alt="Step 3: 結果表示画面">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WORKFLOW COMPARISON ===== -->
+    <section style="background: var(--bg);">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-arrow-right-arrow-left"></i> Comparison</span>
+                <h2 class="section-title">従来の作業フローとの比較</h2>
+                <p class="section-desc">同じ「写真の背景を晴れにしたい」を実現する場合の、従来の手順と本システムの手順を比較します。</p>
+            </div>
+
+            <div class="workflow-compare reveal">
+                <!-- OLD -->
+                <div class="workflow-col old-flow">
+                    <div class="workflow-col-header">
+                        <div class="workflow-col-icon"><i class="fa-solid fa-person-digging"></i></div>
+                        <div>
+                            <div class="workflow-label">Before</div>
+                            <h3>従来の作業フロー</h3>
+                        </div>
+                    </div>
+                    <div class="workflow-steps">
+                        <div class="wf-step">
+                            <span class="wf-step-num">1</span>
+                            <span class="wf-step-text">社内ページから写真をダウンロード</span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">2</span>
+                            <span class="wf-step-text">Photoshop や外部の画像生成AIを開く</span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">3</span>
+                            <span class="wf-step-text">写真をアップロード</span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">4</span>
+                            <span class="wf-step-text">プロンプトを調整しながら生成</span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">5</span>
+                            <span class="wf-step-text">結果をダウンロード</span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">6</span>
+                            <span class="wf-step-text">手動でリサイズ・形式変換して社内で共有<small>メール添付用にサイズ調整が必要</small></span>
+                        </div>
+                    </div>
+                    <div class="workflow-result">
+                        <i class="fa-solid fa-clock"></i>
+                        10分〜数日（企画課などへ依頼時）
+                    </div>
+                </div>
+
+                <!-- VS -->
+                <div class="workflow-vs">
+                    <div class="workflow-vs-badge">VS</div>
+                </div>
+
+                <!-- NEW -->
+                <div class="workflow-col new-flow">
+                    <div class="workflow-col-header">
+                        <div class="workflow-col-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <div>
+                            <div class="workflow-label">After</div>
+                            <h3>本システム</h3>
+                        </div>
+                    </div>
+                    <div class="workflow-steps">
+                        <div class="wf-step">
+                            <span class="wf-step-num">1</span>
+                            <span class="wf-step-text">社内ページの写真詳細画面で<br>日本語の指示を入力して送信<small>「晴れにする」だけでOK</small></span>
+                        </div>
+                        <div class="wf-step">
+                            <span class="wf-step-num">2</span>
+                            <span class="wf-step-text">結果を確認してダウンロード<small>リサイズ・形式変換は自動処理済み</small></span>
+                        </div>
+                    </div>
+                    <div style="margin-top:1rem; padding:0.75rem 1rem; background:rgba(4,120,87,0.06); border-radius:10px; font-size:0.85rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.6rem;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);"></i>
+                        過去に生成した画像は履歴からいつでも再ダウンロードできます
+                    </div>
+                    <div class="workflow-result">
+                        <i class="fa-solid fa-bolt"></i>
+                        数十秒 ／ 数円
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WAVE ===== -->
+    <div class="wave-divider">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" fill="#f1f5f9"/>
+        </svg>
+    </div>
+
+    <!-- ===== BEFORE / AFTER ===== -->
+    <section style="background: #f1f5f9;">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-images"></i> Examples</span>
+                <h2 class="section-title">指示文と出力結果の例</h2>
+                <p class="section-desc">実際にシステムに入力した指示文と、その出力結果です。指示はすべて日本語の自然文で、専門的なプロンプト記法は不要です。</p>
+            </div>
+
+            <div class="ba-grid">
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">1</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「人とベビーカーを消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/01_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/01_after.png" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        指定した人物・物体だけを除去。製品（ベンチ・シェルター）の形状や背景の構造はシステム側の制約で自動保持されます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">2</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「晴れにする」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/02_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/02_after.webp" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        天候・光の条件変更の例。短い指示文でも、カメラ位置や被写体の構図は変わらず天候だけが書き換わります。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">3</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ロゴを消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/05_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/05_after.png" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        製品表面のロゴや文字を除去する例。素材の質感やテクスチャを維持したまま自然に消去されます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">4</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「夜にしてベンチの下に暖色の照明をつける。人を消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/03_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/03_after.png" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        複合指示の例。時間帯の変更（昼→夜）、照明の追加、人物消去を1回の指示で同時処理しています。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">5</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「スロープをおりていく車いすにのった女性。車いすの横には男性。船は消す。快晴にして桜が満開。」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/04_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/04_after.png" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        季節変更・人物追加・不要物消去・天候変更を同時に指示した例。複数の要件を一度のリクエストで処理できます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">6</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「製品情報を画像に入れて」（指示不要 ― 写真に紐づく型番等を自動取得）</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./07before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./07_after.png" alt="製品情報付き生成画像">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        社内データベースで写真と紐づいている製品の型番・名称などを自動で取得し、画像内に埋め込んで出力した例です。ユーザーが手で製品情報を入力する必要はありません。
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SPEC OVERVIEW ===== -->
+    <section class="ba-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-microchip"></i> System Spec</span>
+                <h2 class="section-title">機能の基本仕様</h2>
+                <p class="section-desc">本機能の技術的な概要です。社内写真管理システムに統合されており、追加のインストールやアカウント登録は不要です。</p>
+            </div>
+
+            <div class="spec-grid">
+                <div class="spec-card reveal">
+                    <div class="spec-card-icon green"><i class="fa-solid fa-robot"></i></div>
+                    <div class="spec-value">Gemini Flash Image</div>
+                    <h4>利用AIモデル</h4>
+                    <p>OpenRouter API 経由で Google の画像生成モデルを呼び出しています。</p>
+                </div>
+                <div class="spec-card reveal reveal-delay-1">
+                    <div class="spec-card-icon blue"><i class="fa-solid fa-clock"></i></div>
+                    <div class="spec-value">約 10 秒</div>
+                    <h4>1回あたりの処理時間</h4>
+                    <p>指示送信から結果表示までの目安時間です。</p>
+                </div>
+                <div class="spec-card reveal reveal-delay-2">
+                    <div class="spec-card-icon amber"><i class="fa-solid fa-coins"></i></div>
+                    <div class="spec-value">数円〜 / 1枚</div>
+                    <h4>従量課金（API利用料）</h4>
+                    <p>月額固定費はありません。生成1回ごとにトークン消費量に応じた API 利用料のみが発生します。</p>
+                </div>
+                <div class="spec-card reveal">
+                    <div class="spec-card-icon slate"><i class="fa-solid fa-text-width"></i></div>
+                    <div class="spec-value">最大 2,000 文字</div>
+                    <h4>指示文の文字数上限</h4>
+                    <p>1回の編集で入力できるプロンプトの上限です。日本語で普通に指示する範囲なら十分な長さです。</p>
+                </div>
+                <div class="spec-card reveal reveal-delay-1">
+                    <div class="spec-card-icon green"><i class="fa-solid fa-file-image"></i></div>
+                    <div class="spec-value">WebP / JPEG</div>
+                    <h4>出力フォーマット</h4>
+                    <p>生成画像は WebP（品質82）で保存されます。ダウンロード時は JPEG（品質88）に自動変換されます。</p>
+                </div>
+                <div class="spec-card reveal reveal-delay-2">
+                    <div class="spec-card-icon blue"><i class="fa-solid fa-database"></i></div>
+                    <div class="spec-value">自社DB直接保存</div>
+                    <h4>画像の保管先</h4>
+                    <p>生成された画像はすべて社内データベースのに直接保存されます。外部ストレージへの送信はありません。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== AUTO CONSTRAINTS ===== -->
+    <section class="infographic-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-shield-halved"></i> Auto Tuning</span>
+                <h2 class="section-title">裏側で行っているプロンプト補正</h2>
+                <p class="section-desc">入力に慣れていない方でも安心して使えるよう、ユーザーが書いた指示文をそのままAIに渡すのではなく、システム側で「崩れにくくなるルール」を自動で追加してからAIに送信しています。ユーザーは意識する必要はありません。</p>
+            </div>
+
+            <div class="constraint-grid">
+                <div class="constraint-card reveal">
+                    <h4><i class="fa-solid fa-arrows-rotate"></i> 画像の向きが変わらないようにする</h4>
+                    <p>横長の写真が縦長になってしまう、といった事故を防ぎます。元画像の縦横を判定して「この向きのまま出力して」という指示を自動で付け加えています。</p>
+                    <code class="code-inline">"Keep landscape orientation exactly as input. Do not rotate the image."</code>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1">
+                    <h4><i class="fa-solid fa-vector-square"></i> 製品の形や構図が崩れないようにする</h4>
+                    <p>AIは指示に忠実すぎるあまり、製品の形を変えたりカメラの角度を動かしてしまうことがあります。それを防ぐため「カメラ位置・構図・被写体の形はそのままにして」という制約を毎回自動で入れています。</p>
+                    <code class="code-inline">"Keep the camera position, framing/composition, perspective, and object geometry exactly as in the input image."</code>
+                </div>
+                <div class="constraint-card reveal">
+                    <h4><i class="fa-solid fa-user"></i> 人物が日本人として描かれるようにする</h4>
+                    <p>何も指定しないとAIは欧米系の人物を生成しがちです。国内向けの提案資料で違和感が出ないよう、人物を生成する場合は日本人として描写する指示を自動で追加しています。</p>
+                    <code class="code-inline">"If any human person is generated or edited, always depict the person as Japanese."</code>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1">
+                    <h4><i class="fa-solid fa-image"></i> ファイルサイズを自動で軽くする</h4>
+                    <p>AIが出力した画像はそのままだと重いので、システムが自動で圧縮してから保存します。ダウンロード時にはメールや資料にそのまま使える JPEG に変換されるため、リサイズなどの手間もかかりません。</p>
+                    <code class="code-inline">WebP Q82 (保存) → JPEG Q88 (ダウンロード)</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WAVE ===== -->
+    <div class="wave-divider flip">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 40C240 0 480 80 720 40C960 0 1200 80 1440 40V80H0V40Z" fill="#ffffff"/>
+        </svg>
+    </div>
+
+    <!-- ===== ARCHITECTURE ===== -->
+    <section class="constraint-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-diagram-project"></i> Architecture</span>
+                <h2 class="section-title">システム構成と料金体系</h2>
+                <p class="section-desc">社内システムから OpenRouter API を経由して画像生成 AI モデルを呼び出す構成です。通信はすべて HTTPS で暗号化されます。</p>
+            </div>
+
+            <div class="infographic-card reveal">
+                <div class="flowchart-area">
+                    <div class="flowchart">
+                        <div class="flow-node internal">
+                            <div class="node-icon-wrap"><i class="fa-solid fa-server"></i></div>
+                            <h4>風憩セコロ<br>社内システム</h4>
+                            <p>ユーザー入力に制約を結合<br>セッション管理・画像保存</p>
+                        </div>
+                        <div class="flow-arrow"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                        <div class="flow-node api">
+                            <div class="node-icon-wrap"><i class="fa-solid fa-network-wired"></i></div>
+                            <h4>OpenRouter API</h4>
+                            <p>モデルルーティング<br>HTTPS 暗号化通信</p>
+                        </div>
+                        <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                        <div class="flow-node ai">
+                            <div class="node-icon-wrap"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <h4>Gemini Flash Image</h4>
+                            <p>Google の画像生成AIモデル<br>設定で別モデルに切替可能</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pricing-area">
+                    <div class="pricing-text">
+                        <h3>完全従量課金制 ― 月額固定費なし</h3>
+                        <p>費用は API のトークン消費量に応じた従量課金のみです。使わない月はコストゼロ。</p>
+                    </div>
+                    <div class="pricing-value">数円〜 / 1枚</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FUTURE: PRODUCT COMPOSITING ===== -->
+    <section style="background: linear-gradient(180deg, #f8fafc 0%, #f0fdf4 100%);">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag" style="background: #fffbeb; color: var(--accent-dark);"><i class="fa-solid fa-flask"></i> Coming Soon</span>
+                <h2 class="section-title">将来的に検討していること</h2>
+                <p class="section-desc">社内データベースに登録された製品情報をAIが参照し、製品名を指示するだけで現場写真への合成イメージを生成する機能です。現時点ではまだ利用できません。</p>
+            </div>
+
+
+            <div class="ba-card reveal" style="opacity:0.92;">
+                <div class="ba-card-header">
+                    <span class="ba-number" style="background: var(--accent-dark);">?</span>
+                    <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ソラマメを置いて」</span>
+                </div>
+                <div class="ba-images-3col">
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-before">元の写真</span>
+                        <img src="./06_before.jpg" alt="現場写真" style="max-height:400px; object-fit:cover;">
+                    </div>
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-fail">通常のAI（製品を知らない）</span>
+                        <img src="./06_after2.png" alt="通常AI生成結果" style="max-height:400px; object-fit:cover;">
+                    </div>
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-after">社内DB連携AI</span>
+                        <img src="./06_after.png" alt="社内DB連携による生成イメージ" style="max-height:400px; object-fit:cover;">
+                    </div>
+                </div>
+                <div class="ba-card-footer">
+                    左: 元の現場写真 ／ 中央: 製品データなしで生成した結果（ソラマメの形状を知らないため正しく再現できない） ／ 右: 社内DBから製品情報を参照して生成するイメージ
+                </div>
+            </div>
+
+            <div class="constraint-grid" style="margin-top: 2.5rem;">
+                <div class="constraint-card reveal" style="background: white;">
+                    <h4><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> いまの課題</h4>
+                    <p>現在のAIモデルは「ソラマメ」「パーゴラ」といった風憩セコロの製品名を知りません。そのため製品名だけで指示しても、中央の画像のようにまったく違うものが出てきてしまいます。AIは「ソラマメ」という言葉から何を作ればいいかわからないのです。</p>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1" style="background: white;">
+                    <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
+                    <p>社内のデータベースに製品ごとの写真や図面を登録しておき、「ソラマメ」と入力されたら該当する製品データを自動で引っ張ってきてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-card reveal">
+                <h2>写真詳細ページからご利用いただけます</h2>
+                <p>写真管理システムにログイン後、任意の写真の詳細画面を開くと右パネルに AI 編集機能が表示されます。</p>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:1.5rem; margin-top:1.5rem;">
+                    <a href="https://sync.fukei.co.jp/photos/" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:0.6rem; padding:1rem 2.5rem; background:white; color:var(--primary-dark); font-weight:800; font-size:1.05rem; border-radius:99px; text-decoration:none; box-shadow:0 4px 15px rgba(0,0,0,0.15); transition:transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.15)'">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> 社内写真管理システムを開く
+                    </a>
+                    <div class="cta-logo" style="margin-top:0;">
+                        <i class="fa-solid fa-leaf"></i> FUUKEI SECORO CORPORATION
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 風憩セコロ株式会社 社内システム技術解説資料</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Sticky Header
+        const header = document.getElementById('siteHeader');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // Step 1 Typing Demo
+        (function() {
+            const text = '橋を走ってわたる子供たちの後ろ姿。';
+            const el = document.getElementById('stepTypingText');
+            const cursor = document.getElementById('stepCursor');
+
+            function run() {
+                el.textContent = '';
+                cursor.style.display = '';
+                let i = 0;
+                function typeChar() {
+                    if (i < text.length) {
+                        el.textContent += text[i];
+                        i++;
+                        setTimeout(typeChar, 80 + Math.random() * 60);
+                    } else {
+                        setTimeout(function() {
+                            cursor.style.display = 'none';
+                            setTimeout(run, 3000);
+                        }, 2000);
+                    }
+                }
+                setTimeout(typeChar, 1000);
+            }
+
+            const obs = new IntersectionObserver(function(entries) {
+                if (entries[0].isIntersecting) {
+                    run();
+                    obs.disconnect();
+                }
+            }, { threshold: 0.3 });
+            obs.observe(document.getElementById('stepTypingDemo'));
+        })();
+
+        // Hero Demo Animation
+        (function() {
+            const text = '人とベビーカーを消して';
+            const typingEl = document.getElementById('heroTypingText');
+            const cursorEl = document.getElementById('heroCursor');
+            const btnEl = document.getElementById('heroBtn');
+            const afterEl = document.getElementById('heroAfter');
+            let loopTimeout;
+
+            function runDemo() {
+                // Reset
+                typingEl.textContent = '';
+                cursorEl.style.display = '';
+                btnEl.className = 'hero-demo-btn';
+                btnEl.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+                afterEl.classList.remove('show');
+
+                // Phase 1: Type text
+                let i = 0;
+                function typeChar() {
+                    if (i < text.length) {
+                        typingEl.textContent += text[i];
+                        i++;
+                        setTimeout(typeChar, 80 + Math.random() * 60);
+                    } else {
+                        // Typing done - activate button
+                        btnEl.classList.add('active');
+                        setTimeout(sendAction, 600);
+                    }
+                }
+                setTimeout(typeChar, 1500);
+            }
+
+            function sendAction() {
+                // Phase 2: "Send" - button pulses
+                btnEl.classList.remove('active');
+                btnEl.classList.add('processing');
+                btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                cursorEl.style.display = 'none';
+
+                // Phase 3: Show result after "processing"
+                setTimeout(function() {
+                    afterEl.classList.add('show');
+                    btnEl.classList.remove('processing');
+                    btnEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    btnEl.style.background = '#059669';
+
+                    // Phase 4: Hold result, then restart loop
+                    loopTimeout = setTimeout(function() {
+                        btnEl.style.background = '';
+                        runDemo();
+                    }, 4000);
+                }, 1500);
+            }
+
+            // Start when hero is visible
+            const heroObserver = new IntersectionObserver(function(entries) {
+                if (entries[0].isIntersecting) {
+                    runDemo();
+                    heroObserver.disconnect();
+                }
+            }, { threshold: 0.3 });
+            heroObserver.observe(document.getElementById('heroDemoContainer'));
+        })();
+    </script>
+</body>
+</html>
