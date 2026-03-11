@@ -53,48 +53,6 @@
             font-family: 'JetBrains Mono', 'Consolas', monospace;
         }
 
-        /* ===== HEADER ===== */
-        .site-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 2rem;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .site-header.scrolled {
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 1px 20px rgba(0,0,0,0.06);
-            padding: 0.75rem 2rem;
-        }
-        .header-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .brand-logo {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        .header-badge {
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 0.35rem 1rem;
-            border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-        }
-
         /* ===== LAYOUT ===== */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
         section { padding: 6rem 0; position: relative; }
@@ -143,7 +101,7 @@
             align-items: center;
             position: relative;
             z-index: 2;
-            padding-top: 5rem;
+            padding-top: 2.5rem;
         }
 
         .hero-overline {
@@ -1094,7 +1052,7 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .hero-content { grid-template-columns: 1fr; padding-top: 7rem; gap: 3rem; }
+            .hero-content { grid-template-columns: 1fr; padding-top: 3rem; gap: 3rem; }
             .hero-visual { max-width: 600px; margin: 0 auto; }
             .hero-float-badge { display: none; }
             .process-step { grid-template-columns: 1fr; gap: 1.5rem; }
@@ -1118,7 +1076,7 @@
             section { padding: 4rem 0; }
             .container { padding: 0 1.25rem; }
             .hero { min-height: auto; padding: 0; }
-            .hero-content { padding-top: 6rem; padding-bottom: 3rem; }
+            .hero-content { padding-top: 2.5rem; padding-bottom: 3rem; }
             .hero-title { font-size: 2rem; }
             .ba-card-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 1.25rem; }
             .ba-images { padding: 1rem; gap: 1rem; }
@@ -1146,16 +1104,6 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="site-header" id="siteHeader">
-        <div class="header-inner">
-            <div class="brand-logo">
-                <i class="fa-solid fa-leaf"></i> 風憩セコロ
-            </div>
-            <div class="header-badge">社内システム技術解説</div>
-        </div>
-    </header>
-
     <!-- ===== HERO ===== -->
     <section class="hero">
         <div class="container">
@@ -1169,9 +1117,6 @@
                         事例写真を<br>その場で補正する<br>
                         <span class="gradient-text">AI写真編集機能</span>
                     </h1>
-                    <p class="hero-desc reveal reveal-delay-2">
-                        社内の写真管理ページに組み込まれたAI編集機能です。写真詳細画面から直接、日本語の指示文を入力するだけで背景変更・不要物除去・シーン変更などの画像加工が行えます。
-                    </p>
                 </div>
                 <div class="hero-visual reveal reveal-delay-2">
                     <div class="hero-demo" id="heroDemoContainer">
@@ -1944,12 +1889,6 @@
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        // Sticky Header
-        const header = document.getElementById('siteHeader');
-        window.addEventListener('scroll', () => {
-            header.classList.toggle('scrolled', window.scrollY > 60);
-        }, { passive: true });
 
         // Step 1 Typing Demo
         (function() {
