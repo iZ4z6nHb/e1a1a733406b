@@ -1485,6 +1485,36 @@
         </div>
     </section>
 
+    <!-- ===== DATA & LICENSE ===== -->
+    <section style="background: #f8fafc;">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-scale-balanced"></i> Data & License</span>
+                <h2 class="section-title">データの取り扱いと生成画像の権利</h2>
+                <p class="section-desc">外部APIを利用するにあたってのデータの流れと、生成された画像の権利関係を整理しています。</p>
+            </div>
+
+            <div class="constraint-grid">
+                <div class="constraint-card reveal">
+                    <h4><i class="fa-solid fa-arrow-right-arrow-left"></i> 処理時のデータの流れ</h4>
+                    <p>画像編集の処理時、写真データは社内サーバーから OpenRouter API を経由して Google の AI モデルに送信されます。処理完了後、結果画像は社内データベースに保存されます。</p>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1">
+                    <h4><i class="fa-solid fa-lock"></i> 外部での保存・学習には使われない</h4>
+                    <p>OpenRouter・Google ともに、有料API経由で送信されたデータをモデルの学習に使用しないことを利用規約で明記しています。送信データは処理後に破棄されます。</p>
+                </div>
+                <div class="constraint-card reveal">
+                    <h4><i class="fa-solid fa-certificate"></i> 生成画像の権利は自社に帰属</h4>
+                    <p>Google Gemini API の利用規約上、APIを通じて生成された画像の権利はユーザー（利用者側）に帰属します。カタログ・提案書・Webサイトなどの商用利用が可能です。</p>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1">
+                    <h4><i class="fa-solid fa-triangle-exclamation"></i> 留意事項</h4>
+                    <p>外部APIの利用規約は将来的に変更される可能性があります。また、AI生成画像に関する法的整備は発展途上の分野であるため、対外的に重要な用途では都度確認を推奨します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== FUTURE: PRODUCT COMPOSITING ===== -->
     <section style="background: linear-gradient(180deg, #f8fafc 0%, #f0fdf4 100%);">
         <div class="container">
@@ -1529,6 +1559,10 @@
                 <div class="constraint-card reveal reveal-delay-1" style="background: white;">
                     <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
                     <p>社内のデータベースに紐づいている製品を学習データとしてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
+                </div>
+                <div class="constraint-card reveal" style="background: white;">
+                    <h4><i class="fa-solid fa-handshake" style="color: var(--info);"></i> 営業現場での活用イメージ</h4>
+                    <p>たとえば営業先で現地の写真を撮り、「ここにソラマメを置いて」と入力するだけで設置イメージをその場で生成できるようになります。提案書の作成を待たずに、お客様との打ち合わせ中にイメージを共有できる可能性があります。</p>
                 </div>
             </div>
         </div>
