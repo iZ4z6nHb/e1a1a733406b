@@ -1432,9 +1432,53 @@
                     <p>AIが出力した画像はそのままだと重いので、システムが自動で圧縮してから保存します。ダウンロード時にはメールや資料にそのまま使える JPEG に変換されるため、リサイズなどの手間もかかりません。</p>
                     <code class="code-inline">WebP Q82 (保存) → JPEG Q88 (ダウンロード)</code>
                 </div>
-                <div class="constraint-card reveal">
-                    <h4><i class="fa-solid fa-sliders"></i> 利用状況に応じた継続的チューニング</h4>
-                    <p>これらの補正ルールは固定ではなく、実際の利用状況や生成結果の傾向を見ながら随時調整しています。よくある失敗パターンが見つかれば新しい制約を追加し、不要になったものは外すなど、使われるほど精度が上がっていく運用をしています。</p>
+            </div>
+
+            <!-- 継続的チューニング：インフォグラフィック -->
+            <div class="reveal" style="margin-top: 2.5rem; background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); border-radius: var(--radius-md); padding: 2.5rem; border: 1px solid rgba(4,120,87,0.12);">
+                <div style="text-align:center; margin-bottom: 2rem;">
+                    <span style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--primary); color:white; padding:0.4rem 1.2rem; border-radius:99px; font-size:0.8rem; font-weight:700; letter-spacing:0.05em;">
+                        <i class="fa-solid fa-sliders"></i> 継続的チューニング
+                    </span>
+                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-secondary);">補正ルールは固定ではなく、利用状況を見ながら随時調整しています</p>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:140px; max-width:200px; text-align:center; padding:1.25rem 0.75rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:48px; height:48px; margin:0 auto 0.6rem; background:#e0f2fe; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-users" style="color:var(--info); font-size:1.1rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.85rem; margin-bottom:0.2rem;">利用傾向を確認</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">よく使われる指示や<br>結果の傾向を把握</p>
+                    </div>
+                    <div style="font-size:1.2rem; color:var(--primary); flex-shrink:0;"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div style="flex:1; min-width:140px; max-width:200px; text-align:center; padding:1.25rem 0.75rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:48px; height:48px; margin:0 auto 0.6rem; background:#fef3c7; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-magnifying-glass-chart" style="color:var(--accent-dark); font-size:1.1rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.85rem; margin-bottom:0.2rem;">失敗パターン分析</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">崩れやすいケースや<br>よくあるミスを特定</p>
+                    </div>
+                    <div style="font-size:1.2rem; color:var(--primary); flex-shrink:0;"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div style="flex:1; min-width:140px; max-width:200px; text-align:center; padding:1.25rem 0.75rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:48px; height:48px; margin:0 auto 0.6rem; background:#ecfdf5; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-wrench" style="color:var(--primary); font-size:1.1rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.85rem; margin-bottom:0.2rem;">制約ルールを更新</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">新しい制約を追加<br>不要なものは削除</p>
+                    </div>
+                    <div style="font-size:1.2rem; color:var(--primary); flex-shrink:0;"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div style="flex:1; min-width:140px; max-width:200px; text-align:center; padding:1.25rem 0.75rem; background:white; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+                        <div style="width:48px; height:48px; margin:0 auto 0.6rem; background:#f0fdf4; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-arrow-trend-up" style="color:#059669; font-size:1.1rem;"></i>
+                        </div>
+                        <h4 style="font-size:0.85rem; margin-bottom:0.2rem;">精度が向上</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">使われるほど<br>結果の品質が上がる</p>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:1.25rem;">
+                    <div style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.8rem; color:var(--primary); background:rgba(4,120,87,0.06); padding:0.5rem 1rem; border-radius:99px;">
+                        <i class="fa-solid fa-rotate"></i> このサイクルを継続的に回しています
+                    </div>
                 </div>
             </div>
         </div>
@@ -1555,6 +1599,17 @@
                 </div>
             </div>
 
+            <div class="constraint-grid" style="margin-top: 2rem;">
+                <div class="constraint-card reveal" style="background: white;">
+                    <h4><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> 既存AIの課題</h4>
+                    <p>既存のAIモデルは「ソラマメ」といった風憩セコロの製品を知りません。そのため製品名だけで指示しても、まったく違うものが出てきてしまいます。</p>
+                </div>
+                <div class="constraint-card reveal reveal-delay-1" style="background: white;">
+                    <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
+                    <p>社内のデータベースに紐づいている製品を学習データとしてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
+                </div>
+            </div>
+
             <div class="ba-card reveal" style="opacity:0.92; margin-top:2rem;">
                 <div class="ba-card-header">
                     <span class="ba-number" style="background: var(--accent-dark);">?</span>
@@ -1595,14 +1650,23 @@
                 </div>
             </div>
 
-            <div class="constraint-grid" style="margin-top: 2.5rem;">
-                <div class="constraint-card reveal" style="background: white;">
-                    <h4><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> 既存AIの課題</h4>
-                    <p>既存のAIモデルは「ソラマメ」といった風憩セコロの製品を知りません。そのため製品名だけで指示しても、まったく違うものが出てきてしまいます。</p>
+            <div class="ba-card reveal" style="opacity:0.92; margin-top:2rem;">
+                <div class="ba-card-header">
+                    <span class="ba-number" style="background: var(--accent-dark);">?</span>
+                    <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ご神木を囲うようにZDT-Rを配置し、夜のシーンでLEDを点灯させる。」</span>
                 </div>
-                <div class="constraint-card reveal reveal-delay-1" style="background: white;">
-                    <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
-                    <p>社内のデータベースに紐づいている製品を学習データとしてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
+                <div class="ba-images">
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-before">Before（現場写真）</span>
+                        <img src="./11_before.jpg" alt="ご神木の現場写真" style="aspect-ratio:16/9; object-fit:cover;" loading="lazy" decoding="async">
+                    </div>
+                    <div class="ba-img-wrap">
+                        <span class="ba-img-label label-after">After（ZDT-R + LED）</span>
+                        <img src="./11_after.png" alt="ZDT-Rを配置し夜間点灯したイメージ" style="aspect-ratio:16/9; object-fit:cover;" loading="lazy" decoding="async">
+                    </div>
+                </div>
+                <div class="ba-card-footer">
+                    ご神木の周囲に ZDT-R を配置し、夜間のLED演出まで含めて提案した例。昼間の現場写真から、空間演出を含む完成イメージを即座に作成できます。
                 </div>
             </div>
 
