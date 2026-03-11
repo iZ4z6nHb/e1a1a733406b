@@ -1330,6 +1330,26 @@
                 <div class="ba-card reveal">
                     <div class="ba-card-header">
                         <span class="ba-number">6</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ベンチに人を座らせる」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./08_before.webp" alt="Before">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./08_after.png" alt="After">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        人物を追加する例。指定した場所に自然な姿勢で人物を配置します。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">7</span>
                         <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「製品情報を画像に入れて」（指示不要 ― 写真に紐づく型番等を自動取得）</span>
                     </div>
                     <div class="ba-images">
@@ -1523,11 +1543,11 @@
             <div class="constraint-grid" style="margin-top: 2.5rem;">
                 <div class="constraint-card reveal" style="background: white;">
                     <h4><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> いまの課題</h4>
-                    <p>現在のAIモデルは「ソラマメ」「パーゴラ」といった風憩セコロの製品名を知りません。そのため製品名だけで指示しても、中央の画像のようにまったく違うものが出てきてしまいます。AIは「ソラマメ」という言葉から何を作ればいいかわからないのです。</p>
+                    <p>現在のAIモデルは「ソラマメ」といった風憩セコロの製品を知りません。そのため製品名だけで指示しても、まったく違うものが出てきてしまいます。</p>
                 </div>
                 <div class="constraint-card reveal reveal-delay-1" style="background: white;">
                     <h4><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> 社内DB連携で実現へ</h4>
-                    <p>社内のデータベースに製品ごとの写真や図面を登録しておき、「ソラマメ」と入力されたら該当する製品データを自動で引っ張ってきてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
+                    <p>社内のデータベースに紐づいている製品を学習データとしてAIに渡すパイプラインを構築。これにより、製品名を書くだけで設置イメージを作れるようになります。</p>
                 </div>
             </div>
         </div>
