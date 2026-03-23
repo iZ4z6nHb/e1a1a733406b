@@ -1144,6 +1144,149 @@
     <!-- ===== WAVE ===== -->
     <div class="wave-divider">
         <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" fill="#f1f5f9"/>
+        </svg>
+    </div>
+
+    <!-- ===== BEFORE / AFTER ===== -->
+    <section style="background: #f1f5f9;">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag"><i class="fa-solid fa-images"></i> Examples</span>
+                <h2 class="section-title">指示文と出力結果の例</h2>
+                <p class="section-desc">実際にシステムに入力した指示文と、その出力結果です。指示はすべて日本語の自然文で、専門的なプロンプト記法は不要です。</p>
+            </div>
+
+            <div class="ba-grid">
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">1</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「人とベビーカーを消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/01_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/01_after.png" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        指定した人物・物体だけを除去。製品（ベンチ・シェルター）の形状や背景の構造はシステム側の制約で自動保持されます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">2</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「晴れにする」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/02_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/02_after.webp" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        天候・光の条件変更の例。短い指示文でも、カメラ位置や被写体の構図は変わらず天候だけが書き換わります。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">3</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ロゴを消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/05_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/05_after.png" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        製品表面のロゴや文字を除去する例。素材の質感やテクスチャを維持したまま自然に消去されます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">4</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「夜にしてベンチの下に暖色の照明をつける。人を消す」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/03_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/03_after.png" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        複合指示の例。時間帯の変更（昼→夜）、照明の追加、人物消去を1回の指示で同時処理しています。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">5</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「スロープをおりていく車いすにのった女性。車いすの横には男性。船は消す。快晴にして桜が満開。」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./images/04_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./images/04_after.png" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        季節変更・人物追加・不要物消去・天候変更を同時に指示した例。複数の要件を一度のリクエストで処理できます。
+                    </div>
+                </div>
+
+                <div class="ba-card reveal">
+                    <div class="ba-card-header">
+                        <span class="ba-number">6</span>
+                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ベンチに人を座らせる」</span>
+                    </div>
+                    <div class="ba-images">
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-before">Before</span>
+                            <img src="./08_before.webp" alt="Before" loading="lazy" decoding="async">
+                        </div>
+                        <div class="ba-img-wrap">
+                            <span class="ba-img-label label-after">After</span>
+                            <img src="./08_after.png" alt="After" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="ba-card-footer">
+                        人物を追加する例。指定した場所に自然な姿勢で人物を配置します。
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WAVE ===== -->
+    <div class="wave-divider">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" fill="#ffffff"/>
         </svg>
     </div>
@@ -1293,149 +1436,6 @@
                         数十秒 ／ 数円
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== WAVE ===== -->
-    <div class="wave-divider">
-        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <path d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z" fill="#f1f5f9"/>
-        </svg>
-    </div>
-
-    <!-- ===== BEFORE / AFTER ===== -->
-    <section style="background: #f1f5f9;">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-tag"><i class="fa-solid fa-images"></i> Examples</span>
-                <h2 class="section-title">指示文と出力結果の例</h2>
-                <p class="section-desc">実際にシステムに入力した指示文と、その出力結果です。指示はすべて日本語の自然文で、専門的なプロンプト記法は不要です。</p>
-            </div>
-
-            <div class="ba-grid">
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">1</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「人とベビーカーを消す」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./images/01_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./images/01_after.png" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        指定した人物・物体だけを除去。製品（ベンチ・シェルター）の形状や背景の構造はシステム側の制約で自動保持されます。
-                    </div>
-                </div>
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">2</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「晴れにする」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./images/02_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./images/02_after.webp" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        天候・光の条件変更の例。短い指示文でも、カメラ位置や被写体の構図は変わらず天候だけが書き換わります。
-                    </div>
-                </div>
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">3</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ロゴを消す」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./images/05_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./images/05_after.png" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        製品表面のロゴや文字を除去する例。素材の質感やテクスチャを維持したまま自然に消去されます。
-                    </div>
-                </div>
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">4</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「夜にしてベンチの下に暖色の照明をつける。人を消す」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./images/03_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./images/03_after.png" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        複合指示の例。時間帯の変更（昼→夜）、照明の追加、人物消去を1回の指示で同時処理しています。
-                    </div>
-                </div>
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">5</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「スロープをおりていく車いすにのった女性。車いすの横には男性。船は消す。快晴にして桜が満開。」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./images/04_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./images/04_after.png" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        季節変更・人物追加・不要物消去・天候変更を同時に指示した例。複数の要件を一度のリクエストで処理できます。
-                    </div>
-                </div>
-
-                <div class="ba-card reveal">
-                    <div class="ba-card-header">
-                        <span class="ba-number">6</span>
-                        <span class="ba-prompt"><i class="fa-solid fa-comment-dots"></i>「ベンチに人を座らせる」</span>
-                    </div>
-                    <div class="ba-images">
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-before">Before</span>
-                            <img src="./08_before.webp" alt="Before" loading="lazy" decoding="async">
-                        </div>
-                        <div class="ba-img-wrap">
-                            <span class="ba-img-label label-after">After</span>
-                            <img src="./08_after.png" alt="After" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                    <div class="ba-card-footer">
-                        人物を追加する例。指定した場所に自然な姿勢で人物を配置します。
-                    </div>
-                </div>
-
-
             </div>
         </div>
     </section>
